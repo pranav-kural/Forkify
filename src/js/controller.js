@@ -1,4 +1,5 @@
 import { transformObjPropNamesToCamelCase } from './utils';
+import { getRecipeHTML } from './views/recipe';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -25,11 +26,17 @@ const showRecipe = async function () {
     // check if request failed
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
 
-    let recipe = transformObjPropNamesToCamelCase(data.data.recipe);
-
-    console.log('recipe', recipe);
+    // get recipe data and pass it on to renderRecipe function
+    // transform property names in original recipe data object to camelCase
+    renderRecipe(transformObjPropNamesToCamelCase(data.data.recipe));
   } catch (err) {
     console.error(err);
   }
 };
 showRecipe();
+
+const renderRecipe = recipe => {
+  // hide message
+  recipeContainer.innerHTML = '';
+  recipeContainer.insertAdjacentHTML('afterbegin', getRecipeHTML(recipe));
+};
