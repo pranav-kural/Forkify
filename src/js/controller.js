@@ -1,6 +1,10 @@
+// import polyfills to support old browsers
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+// import helper functions
 import { transformObjPropNamesToCamelCase } from './utils';
+// import HTML components
 import { getRecipeHTML, spinnerHTML } from './views/htmlComponents';
-// import spinnerHTML from './views/htmlComponents';
 
 const recipeContainer = document.querySelector('.recipe');
 
