@@ -1,5 +1,6 @@
 import { transformObjPropNamesToCamelCase } from './utils';
-import { getRecipeHTML } from './views/recipe';
+import { getRecipeHTML, spinnerHTML } from './views/htmlComponents';
+// import spinnerHTML from './views/htmlComponents';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -11,11 +12,20 @@ const timeout = function (s) {
   });
 };
 
+const renderSpinner = parentEl => {
+  // clear recipe countainer
+  recipeContainer.innerHTML = '';
+  // display spinner
+  parentEl.insertAdjacentHTML('afterbegin', spinnerHTML);
+};
+
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
 
 const showRecipe = async function () {
+  // render spinner
+  renderSpinner(recipeContainer);
   try {
     // ftech single recipe
     const res = await fetch(
@@ -33,10 +43,11 @@ const showRecipe = async function () {
     console.error(err);
   }
 };
-showRecipe();
 
 const renderRecipe = recipe => {
-  // hide message
+  // clear recipe countainer
   recipeContainer.innerHTML = '';
   recipeContainer.insertAdjacentHTML('afterbegin', getRecipeHTML(recipe));
 };
+
+showRecipe();

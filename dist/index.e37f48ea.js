@@ -504,7 +504,8 @@ function hmrAcceptRun(bundle, id) {
 
 },{}],"aenu9":[function(require,module,exports) {
 var _utils = require("./utils");
-var _recipe = require("./views/recipe");
+var _htmlComponents = require("./views/htmlComponents");
+// import spinnerHTML from './views/htmlComponents';
 const recipeContainer = document.querySelector(".recipe");
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -513,9 +514,17 @@ const timeout = function(s) {
         }, s * 1000);
     });
 };
+const renderSpinner = (parentEl)=>{
+    // clear recipe countainer
+    recipeContainer.innerHTML = "";
+    // display spinner
+    parentEl.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
+};
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 const showRecipe = async function() {
+    // render spinner
+    renderSpinner(recipeContainer);
     try {
         // ftech single recipe
         const res = await fetch("https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886");
@@ -530,14 +539,14 @@ const showRecipe = async function() {
         console.error(err);
     }
 };
-showRecipe();
 const renderRecipe = (recipe)=>{
-    // hide message
+    // clear recipe countainer
     recipeContainer.innerHTML = "";
-    recipeContainer.insertAdjacentHTML("afterbegin", (0, _recipe.getRecipeHTML)(recipe));
+    recipeContainer.insertAdjacentHTML("afterbegin", (0, _htmlComponents.getRecipeHTML)(recipe));
 };
+showRecipe();
 
-},{"./utils":"72Dku","./views/recipe":"dRlYE"}],"72Dku":[function(require,module,exports) {
+},{"./utils":"72Dku","./views/htmlComponents":"84xeR"}],"72Dku":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 /**
@@ -585,10 +594,11 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"dRlYE":[function(require,module,exports) {
+},{}],"84xeR":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getRecipeHTML", ()=>getRecipeHTML);
+parcelHelpers.export(exports, "spinnerHTML", ()=>spinnerHTML);
 var _iconsSvg = require("url:../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 function getRecipeHTML(recipe) {
@@ -703,8 +713,15 @@ function getRecipeHTML(recipe) {
         </div>
   `;
 }
+const spinnerHTML = `
+<div class="spinner">
+<svg>
+  <use href="${(0, _iconsSvgDefault.default)}#icon-loader"></use>
+</svg>
+</div>
+`;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../../img/icons.svg":"loVOp"}],"loVOp":[function(require,module,exports) {
+},{"url:../../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"loVOp":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("hWUTQ") + "icons.dfd7a6db.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
