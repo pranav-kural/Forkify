@@ -1,0 +1,26 @@
+{
+  "name": "forkify",
+  "version": "1.0.0",
+  "description": "Recipe Application",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pranav-kural/Forkify.git"
+  },
+  "keywords": [
+    "recipe"
+  ],
+  "author": "Pranav Kural",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pranav-kural/Forkify/issues"
+  },
+  "homepage": "https://github.com/pranav-kural/Forkify#readme",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.6.0",
+    "parcel": "^2.6.0"
+  }
+}

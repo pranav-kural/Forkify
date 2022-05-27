@@ -1,0 +1,11 @@
+# npm packages
+node_modules
+
+# MacOS directory file
+.DS_Store
+
+# Prettier formatter configuration file
+.prettierrc
+
+# cache folder created by Parcel
+.parcel-cache
