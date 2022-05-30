@@ -513,6 +513,8 @@ var _model = require("./model");
 // import views
 var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
+var _searchView = require("./views/searchView");
+var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 ///////////////////////////////////////
 const controlRecipe = async function() {
     // get recipe Id from hash (remove first '#' character)
@@ -527,12 +529,26 @@ const controlRecipe = async function() {
         (0, _recipeViewDefault.default).renderError();
     });
 };
+const controlSearchResults = async function() {
+    // get the search query
+    const query = (0, _searchViewDefault.default).getQuery();
+    // if invalid, return
+    if (!query) return;
+    try {
+        await _model.loadSearchResults(query);
+        console.dir(_model.state.search);
+    } catch (err) {
+        (0, _recipeViewDefault.default).renderError();
+    }
+};
+controlSearchResults();
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
+    (0, _searchViewDefault.default).addEventHandler(controlSearchResults);
 })();
 
-},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
+},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM"}],"dkJzX":[function(require,module,exports) {
 "use strict";
 var $ = require("../internals/export");
 var $includes = require("../internals/array-includes").includes;
@@ -2377,12 +2393,10 @@ const loadSearchResults = async function(query) {
             query: query,
             results: data.data.recipes.map((recipe)=>(0, _utils.transformObjPropNamesToCamelCase)(recipe))
         };
-        console.log(state.search.results);
     } catch (err) {
         throw err;
     }
 };
-loadSearchResults("pizza");
 
 },{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -2937,6 +2951,28 @@ Fraction.primeFactors = function(n) {
 };
 module.exports.Fraction = Fraction;
 
-},{}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
+},{}],"9OQAM":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+class SearchView {
+    #parentElement = document.querySelector(".search");
+    getQuery() {
+        return this.#parentElement.querySelector(".search__field").value;
+    }
+    clearInput() {
+        this.#parentElement.querySelector(".search__field").value = "";
+    }
+    addEventHandler(handler) {
+        this.#parentElement.addEventListener("submit", (e)=>{
+            e.preventDefault();
+            handler();
+            this.clearInput();
+        });
+    }
+}
+// export an instance
+exports.default = new SearchView();
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
 
 //# sourceMappingURL=index.e37f48ea.js.map

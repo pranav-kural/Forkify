@@ -41,9 +41,7 @@ export const loadSearchResults = async function (query) {
         transformObjPropNamesToCamelCase(recipe)
       ),
     };
-    console.log(state.search.results);
   } catch (err) {
     throw err;
   }
 };
-loadSearchResults('pizza');
