@@ -513,8 +513,6 @@ var _model = require("./model");
 // import views
 var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
-// import HTML components
-var _htmlComponents = require("./views/markups/htmlComponents");
 const recipeContainer = document.querySelector(".recipe");
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -532,20 +530,10 @@ const showRecipe = async function() {
     if (!recipeId) return;
     // render spinner
     (0, _recipeViewDefault.default).renderSpinner();
-    try {
-        // fetch single recipe
-        const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`);
-        // retrieve data from response
-        const data = await res.json();
-        // check if request failed
-        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-        // get recipe data and pass it on to renderRecipe function
-        _model.loadRecipe(recipeId).then(()=>(0, _recipeViewDefault.default).render(_model.state.recipe)).catch((e)=>{
-            throw new Error(e);
-        });
-    } catch (err) {
+    // get recipe data and pass it on to renderRecipe function
+    _model.loadRecipe(recipeId).then(()=>(0, _recipeViewDefault.default).render(_model.state.recipe)).catch((err)=>{
         console.error(err);
-    }
+    });
 };
 const renderRecipe = (recipe)=>{
     // clear recipe countainer
@@ -558,7 +546,7 @@ const renderRecipe = (recipe)=>{
     "load"
 ].forEach((e)=>addEventListener(e, showRecipe));
 
-},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/markups/htmlComponents":"7VbpP"}],"dkJzX":[function(require,module,exports) {
+},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
 "use strict";
 var $ = require("../internals/export");
 var $includes = require("../internals/array-includes").includes;
@@ -2374,26 +2362,23 @@ parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 var _regeneratorRuntime = require("regenerator-runtime");
 // import helper functions
 var _utils = require("./utils");
+// import api url from config
+var _config = require("./config");
+var _helpers = require("./helpers");
 const state = {
     recipe: {}
 };
 const loadRecipe = async function(recipeId) {
     try {
-        // fetch single recipe
-        const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`);
-        // retrieve data from response
-        const data = await res.json();
-        // check if request failed
-        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-        // update state and store the recipe data
+        // get recipe data using getJSON helper function and update state to store recipe data
         // transform property names in original recipe data object to camelCase
-        state.recipe = (0, _utils.transformObjPropNamesToCamelCase)(data.data.recipe);
+        state.recipe = (0, _utils.transformObjPropNamesToCamelCase)(await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}${recipeId}`).then((responseData)=>responseData.data.recipe));
     } catch (err) {
-        throw new Error(err);
+        console.error(err);
     }
 };
 
-},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku"}],"gkKU3":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2441,6 +2426,31 @@ function transformObjPropNamesToCamelCase(obj) {
     return newObj;
 }
 
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "FORKIFY_API_URL", ()=>FORKIFY_API_URL);
+const FORKIFY_API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/";
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hGI1E":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getJSON", ()=>getJSON);
+const getJSON = async function(url) {
+    try {
+        // fetch single recipe
+        const res = await fetch(url);
+        // retrieve data from response
+        const data = await res.json();
+        // check if request failed
+        if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+        // return response data
+        return data;
+    } catch (err) {
+        throw new Error(err);
+    }
+};
+
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
@@ -2475,7 +2485,6 @@ var _iconsSvg = require("url:../../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _fractional = require("fractional");
 var _fractionalDefault = parcelHelpers.interopDefault(_fractional);
-console.log("Fraction", (0, _fractionalDefault.default));
 function getRecipeHTML(recipe) {
     return `
         <figure class="recipe__fig">
@@ -2529,42 +2538,7 @@ function getRecipeHTML(recipe) {
         <div class="recipe__ingredients">
           <h2 class="heading--2">Recipe ingredients</h2>
           <ul class="recipe__ingredient-list">
-            ${recipe.ingredients.map((ing)=>{
-        return `
-              <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">${ing?.quantity ? new (0, _fractionalDefault.default).Fraction(ing?.quantity).toString() : ""}</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">${ing?.unit}</span>
-                ${ing?.description}
-              </div>
-            </li>
-              `;
-    }).join("")}
-
-            <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">1000</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">g</span>
-                pasta
-              </div>
-            </li>
-
-            <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">0.5</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">cup</span>
-                ricotta cheese
-              </div>
-            </li>
+            ${generateIngredientsComponent(recipe.ingredients)}
           </ul>
         </div>
 
@@ -2587,6 +2561,22 @@ function getRecipeHTML(recipe) {
           </a>
         </div>
   `;
+}
+function generateIngredientsComponent(recipeIngredients) {
+    return recipeIngredients.map((ing)=>{
+        return `
+        <li class="recipe__ingredient">
+        <svg class="recipe__icon">
+          <use href="src/img/icons.svg#icon-check"></use>
+        </svg>
+        <div class="recipe__quantity">${ing?.quantity ? new (0, _fractionalDefault.default).Fraction(ing?.quantity).toString() : ""}</div>
+        <div class="recipe__description">
+          <span class="recipe__unit">${ing?.unit}</span>
+          ${ing?.description}
+        </div>
+      </li>
+        `;
+    }).join("");
 }
 const spinnerHTML = `
 <div class="spinner">

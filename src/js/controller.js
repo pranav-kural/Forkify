@@ -5,8 +5,6 @@ import 'regenerator-runtime/runtime';
 import * as model from './model';
 // import views
 import recipeView from './views/recipeView';
-// import HTML components
-import { spinnerHTML } from './views/markups/htmlComponents';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -29,26 +27,13 @@ const showRecipe = async function () {
   if (!recipeId) return;
   // render spinner
   recipeView.renderSpinner();
-  try {
-    // fetch single recipe
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`
-    );
-    // retrieve data from response
-    const data = await res.json();
-    // check if request failed
-    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-
-    // get recipe data and pass it on to renderRecipe function
-    model
-      .loadRecipe(recipeId)
-      .then(() => recipeView.render(model.state.recipe))
-      .catch(e => {
-        throw new Error(e);
-      });
-  } catch (err) {
-    console.error(err);
-  }
+  // get recipe data and pass it on to renderRecipe function
+  model
+    .loadRecipe(recipeId)
+    .then(() => recipeView.render(model.state.recipe))
+    .catch(err => {
+      console.error(err);
+    });
 };
 
 const renderRecipe = recipe => {

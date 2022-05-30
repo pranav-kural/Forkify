@@ -1,6 +1,9 @@
 import { async } from 'regenerator-runtime';
 // import helper functions
 import { transformObjPropNamesToCamelCase } from './utils';
+// import api url from config
+import { FORKIFY_API_URL } from './config';
+import { getJSON } from './helpers';
 
 // state object
 export const state = {
@@ -10,18 +13,14 @@ export const state = {
 // fetch recipe data
 export const loadRecipe = async function (recipeId) {
   try {
-    // fetch single recipe
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`
-    );
-    // retrieve data from response
-    const data = await res.json();
-    // check if request failed
-    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
-    // update state and store the recipe data
+    // get recipe data using getJSON helper function and update state to store recipe data
     // transform property names in original recipe data object to camelCase
-    state.recipe = transformObjPropNamesToCamelCase(data.data.recipe);
+    state.recipe = transformObjPropNamesToCamelCase(
+      await getJSON(`${FORKIFY_API_URL}${recipeId}`).then(
+        responseData => responseData.data.recipe
+      )
+    );
   } catch (err) {
-    throw new Error(err);
+    console.error(err);
   }
 };
