@@ -23,6 +23,11 @@ class RecipeView {
     // display spinner
     this.#parentElement.insertAdjacentHTML('afterbegin', spinnerHTML);
   }
+
+  addEventHandler(handler) {
+    // add event listeners for updating recipe on view
+    ['hashchange', 'load'].forEach(e => addEventListener(e, handler));
+  }
 }
 
 // export a new instance of recipeView

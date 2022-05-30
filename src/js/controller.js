@@ -6,13 +6,9 @@ import * as model from './model';
 // import views
 import recipeView from './views/recipeView';
 
-const recipeContainer = document.querySelector('.recipe');
-
-// https://forkify-api.herokuapp.com/v2
-
 ///////////////////////////////////////
 
-const showRecipe = async function () {
+const controlRecipe = async function () {
   // get recipe Id from hash (remove first '#' character)
   const recipeId = window.location.hash.slice(1);
   // if no recipe selected yet, return
@@ -28,11 +24,7 @@ const showRecipe = async function () {
     });
 };
 
-const renderRecipe = recipe => {
-  // clear recipe countainer
-  recipeContainer.innerHTML = '';
-  recipeContainer.insertAdjacentHTML('afterbegin', getRecipeHTML(recipe));
-};
-
-// add event listeners for showRecipe
-['hashchange', 'load'].forEach(e => addEventListener(e, showRecipe));
+// initialize event handler
+(function () {
+  recipeView.addEventHandler(controlRecipe);
+})();

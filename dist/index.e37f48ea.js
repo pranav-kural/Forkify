@@ -513,10 +513,8 @@ var _model = require("./model");
 // import views
 var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
-const recipeContainer = document.querySelector(".recipe");
-// https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
-const showRecipe = async function() {
+const controlRecipe = async function() {
     // get recipe Id from hash (remove first '#' character)
     const recipeId = window.location.hash.slice(1);
     // if no recipe selected yet, return
@@ -528,16 +526,10 @@ const showRecipe = async function() {
         console.error(err);
     });
 };
-const renderRecipe = (recipe)=>{
-    // clear recipe countainer
-    recipeContainer.innerHTML = "";
-    recipeContainer.insertAdjacentHTML("afterbegin", getRecipeHTML(recipe));
-};
-// add event listeners for showRecipe
-[
-    "hashchange",
-    "load"
-].forEach((e)=>addEventListener(e, showRecipe));
+// initialize event handler
+(function() {
+    (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
+})();
 
 },{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
 "use strict";
@@ -2481,6 +2473,13 @@ class RecipeView {
         this.#clear();
         // display spinner
         this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
+    }
+    addEventHandler(handler) {
+        // add event listeners for updating recipe on view
+        [
+            "hashchange",
+            "load"
+        ].forEach((e)=>addEventListener(e, handler));
     }
 }
 // export a new instance of recipeView
