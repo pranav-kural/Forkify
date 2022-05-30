@@ -514,13 +514,6 @@ var _model = require("./model");
 var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
 const recipeContainer = document.querySelector(".recipe");
-const timeout = function(s) {
-    return new Promise(function(_, reject) {
-        setTimeout(function() {
-            reject(new Error(`Request took too long! Timeout after ${s} second`));
-        }, s * 1000);
-    });
-};
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 const showRecipe = async function() {
@@ -2375,6 +2368,7 @@ const loadRecipe = async function(recipeId) {
         state.recipe = (0, _utils.transformObjPropNamesToCamelCase)(await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}${recipeId}`).then((responseData)=>responseData.data.recipe));
     } catch (err) {
         console.error(err);
+        throw new Error(err);
     }
 };
 
@@ -2430,16 +2424,25 @@ function transformObjPropNamesToCamelCase(obj) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "FORKIFY_API_URL", ()=>FORKIFY_API_URL);
+parcelHelpers.export(exports, "API_CALL_TIMEOUT_SECONDS", ()=>API_CALL_TIMEOUT_SECONDS);
 const FORKIFY_API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/";
+const API_CALL_TIMEOUT_SECONDS = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hGI1E":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getJSON", ()=>getJSON);
+parcelHelpers.export(exports, "timeout", ()=>timeout);
+/**
+ * Helper functions used throughout the project
+ */ var _config = require("./config");
 const getJSON = async function(url) {
     try {
-        // fetch single recipe
-        const res = await fetch(url);
+        // fetch single recipe, request time's out if it takes longer than 5 seconds
+        const res = await Promise.race([
+            fetch(url),
+            timeout((0, _config.API_CALL_TIMEOUT_SECONDS)), 
+        ]);
         // retrieve data from response
         const data = await res.json();
         // check if request failed
@@ -2450,8 +2453,15 @@ const getJSON = async function(url) {
         throw new Error(err);
     }
 };
+const timeout = function(s) {
+    return new Promise(function(_, reject) {
+        setTimeout(function() {
+            reject(new Error(`Request took too long! Timeout after ${s} second`));
+        }, s * 1000);
+    });
+};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _htmlComponents = require("./markups/htmlComponents");
@@ -2563,7 +2573,7 @@ function getRecipeHTML(recipe) {
   `;
 }
 function generateIngredientsComponent(recipeIngredients) {
-    return recipeIngredients.map((ing)=>{
+    return recipeIngredients?.map((ing)=>{
         return `
         <li class="recipe__ingredient">
         <svg class="recipe__icon">
