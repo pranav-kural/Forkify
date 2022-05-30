@@ -523,12 +523,6 @@ const timeout = function(s) {
         }, s * 1000);
     });
 };
-const renderSpinner = (parentEl)=>{
-    // clear recipe countainer
-    recipeContainer.innerHTML = "";
-    // display spinner
-    parentEl.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
-};
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 const showRecipe = async function() {
@@ -537,7 +531,7 @@ const showRecipe = async function() {
     // if no recipe selected yet, return
     if (!recipeId) return;
     // render spinner
-    renderSpinner(recipeContainer);
+    (0, _recipeViewDefault.default).renderSpinner();
     try {
         // fetch single recipe
         const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`);
@@ -2455,9 +2449,18 @@ class RecipeView {
     #parentElement = document.querySelector(".recipe");
     // render the recipe component on view
     render(recipeData) {
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.getRecipeHTML)(recipeData));
+    }
+    // clear the parent element
+     #clear() {
         // clear recipe countainer
         this.#parentElement.innerHTML = "";
-        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.getRecipeHTML)(recipeData));
+    }
+    renderSpinner() {
+        this.#clear();
+        // display spinner
+        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
     }
 }
 // export a new instance of recipeView

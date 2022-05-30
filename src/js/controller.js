@@ -18,13 +18,6 @@ const timeout = function (s) {
   });
 };
 
-const renderSpinner = parentEl => {
-  // clear recipe countainer
-  recipeContainer.innerHTML = '';
-  // display spinner
-  parentEl.insertAdjacentHTML('afterbegin', spinnerHTML);
-};
-
 // https://forkify-api.herokuapp.com/v2
 
 ///////////////////////////////////////
@@ -35,7 +28,7 @@ const showRecipe = async function () {
   // if no recipe selected yet, return
   if (!recipeId) return;
   // render spinner
-  renderSpinner(recipeContainer);
+  recipeView.renderSpinner();
   try {
     // fetch single recipe
     const res = await fetch(
