@@ -2345,6 +2345,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
+parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 var _regeneratorRuntime = require("regenerator-runtime");
 // import helper functions
 var _utils = require("./utils");
@@ -2352,7 +2353,11 @@ var _utils = require("./utils");
 var _config = require("./config");
 var _helpers = require("./helpers");
 const state = {
-    recipe: {}
+    recipe: {},
+    search: {
+        query: "",
+        results: {}
+    }
 };
 const loadRecipe = async function(recipeId) {
     try {
@@ -2363,6 +2368,21 @@ const loadRecipe = async function(recipeId) {
         throw err;
     }
 };
+const loadSearchResults = async function(query) {
+    try {
+        // get all recipes for the given query
+        const data = await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}?search=${query}`);
+        // update the state
+        state.search = {
+            query: query,
+            results: data.data.recipes.map((recipe)=>(0, _utils.transformObjPropNamesToCamelCase)(recipe))
+        };
+        console.log(state.search.results);
+    } catch (err) {
+        throw err;
+    }
+};
+loadSearchResults("pizza");
 
 },{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {

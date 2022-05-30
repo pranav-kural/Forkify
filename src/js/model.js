@@ -8,6 +8,10 @@ import { getJSON } from './helpers';
 // state object
 export const state = {
   recipe: {},
+  search: {
+    query: '',
+    results: {},
+  },
 };
 
 // fetch recipe data
@@ -24,3 +28,22 @@ export const loadRecipe = async function (recipeId) {
     throw err;
   }
 };
+
+// load search results
+export const loadSearchResults = async function (query) {
+  try {
+    // get all recipes for the given query
+    const data = await getJSON(`${FORKIFY_API_URL}?search=${query}`);
+    // update the state
+    state.search = {
+      query: query,
+      results: data.data.recipes.map(recipe =>
+        transformObjPropNamesToCamelCase(recipe)
+      ),
+    };
+    console.log(state.search.results);
+  } catch (err) {
+    throw err;
+  }
+};
+loadSearchResults('pizza');
