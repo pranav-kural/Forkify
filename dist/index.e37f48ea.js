@@ -528,11 +528,15 @@ const renderSpinner = (parentEl)=>{
 // https://forkify-api.herokuapp.com/v2
 ///////////////////////////////////////
 const showRecipe = async function() {
+    // get recipe Id from hash (remove first '#' character)
+    const recipeId = window.location.hash.slice(1);
+    // if no recipe selected yet, return
+    if (!recipeId) return;
     // render spinner
     renderSpinner(recipeContainer);
     try {
         // ftech single recipe
-        const res = await fetch("https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886");
+        const res = await fetch(`https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`);
         // retrieve data from response
         const data = await res.json();
         // check if request failed
@@ -549,7 +553,11 @@ const renderRecipe = (recipe)=>{
     recipeContainer.innerHTML = "";
     recipeContainer.insertAdjacentHTML("afterbegin", (0, _htmlComponents.getRecipeHTML)(recipe));
 };
-showRecipe();
+// add event listeners for showRecipe
+[
+    "hashchange",
+    "load"
+].forEach((e)=>addEventListener(e, showRecipe));
 
 },{"./utils":"72Dku","./views/htmlComponents":"84xeR","core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ"}],"72Dku":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
