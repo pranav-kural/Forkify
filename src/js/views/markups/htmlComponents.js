@@ -87,7 +87,7 @@ export function getRecipeHTML(recipe) {
 
 function generateIngredientsComponent(recipeIngredients) {
   return recipeIngredients
-    .map(ing => {
+    ?.map(ing => {
       return `
         <li class="recipe__ingredient">
         <svg class="recipe__icon">
