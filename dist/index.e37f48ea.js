@@ -517,7 +517,8 @@ var _searchView = require("./views/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _resultsView = require("./views/resultsView");
 var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
-///////////////////////////////////////
+// hot reloading for parcel
+if (module.hot) module.hot.accept();
 const controlRecipe = async function() {
     // get recipe Id from hash (remove first '#' character)
     const recipeId = window.location.hash.slice(1);
@@ -532,16 +533,18 @@ const controlRecipe = async function() {
     });
 };
 const controlSearchResults = async function() {
-    (0, _resultsViewDefault.default).renderSpinner();
     // get the search query
     const query = (0, _searchViewDefault.default).getQuery();
     // if invalid, return
     if (!query) return;
+    (0, _resultsViewDefault.default).renderSpinner();
     try {
         await _model.loadSearchResults(query);
+        (0, _resultsViewDefault.default).setQuery(_model.state.search.query);
         (0, _resultsViewDefault.default).render(_model.state.search.results);
     } catch (err) {
-        (0, _recipeViewDefault.default).renderError();
+        (0, _resultsViewDefault.default).renderError(); // render the error
+        (0, _resultsViewDefault.default).setQuery(""); // reset query value of resultsView
     }
 };
 // initialize event handler
@@ -2499,6 +2502,7 @@ class RecipeView extends (0, _parentViewDefault.default) {
     constructor(){
         // set parent element
         super(document.querySelector(".recipe"), (0, _htmlComponents.recipeHTML));
+        this._defaultErrorMessage = "We could not find the recipe you're looking for. Please try another one!";
     }
     addEventHandler(handler) {
         // add event listeners for updating recipe on view
@@ -2524,10 +2528,11 @@ class ParentView {
         this._parentElement = parentElement;
         this._markupGenerator = markupGenerator;
         this._defaultMessage = "";
-        this._defaultErrorMessage = "We could not find the recipe you're looking for. Please try another one!";
+        this._defaultErrorMessage = "Oops, an error has occured!";
     }
     // render the component on view
     render(data) {
+        if (!data || Array.isArray(data) && data.length === 0 || data === {}) return this.renderError();
         this._clearParentEl();
         this._parentElement.insertAdjacentHTML("afterbegin", this._markupGenerator(data));
     }
@@ -2603,9 +2608,11 @@ function recipeHTML(recipe) {
           </div>
 
           <div class="recipe__user-generated">
+          <!--
             <svg>
               <use href="${0, _iconsSvgDefault.default}.svg#icon-user"></use>
             </svg>
+          -->
           </div>
           <button class="btn--round">
             <svg class="">
@@ -2663,18 +2670,13 @@ const previewHTML = (data)=>{
 function generatePreviewComponent(data) {
     return `
           <li class="preview">
-            <a class="preview__link preview__link--active" href="#${data?.id}">
+            <a class="preview__link" href="#${data?.id}">
               <figure class="preview__fig">
-                <img src="${data?.imageUrl}" alt="Test" />
+                <img src="${data?.imageUrl}" alt="${data?.title}" />
               </figure>
               <div class="preview__data">
                 <h4 class="preview__title">${data?.title}</h4>
                 <p class="preview__publisher">${data?.publisher}</p>
-                <div class="preview__user-generated">
-                  <svg>
-                    <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
-                  </svg>
-                </div>
               </div>
             </a>
           </li>
@@ -3027,9 +3029,15 @@ var _parentView = require("./parentView");
 var _parentViewDefault = parcelHelpers.interopDefault(_parentView);
 var _htmlComponents = require("./markups/htmlComponents");
 class ResultsView extends (0, _parentViewDefault.default) {
+    _query;
     constructor(){
         // set parent element
         super(document.querySelector(".results"), (0, _htmlComponents.previewHTML));
+        this._defaultErrorMessage = "No recipes found for your query! Please try again! :(";
+    }
+    setQuery(queryValue) {
+        this._query = queryValue;
+        this._defaultErrorMessage = `No recipes found for ${this._query ? "'" + this._query + "'." : "your query!"} Please try again! :(`;
     }
 }
 exports.default = new ResultsView();

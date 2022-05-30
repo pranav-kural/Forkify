@@ -9,7 +9,10 @@ import recipeView from './views/recipeView';
 import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 
-///////////////////////////////////////
+// hot reloading for parcel
+if (module.hot) {
+  module.hot.accept();
+}
 
 const controlRecipe = async function () {
   // get recipe Id from hash (remove first '#' character)
@@ -29,16 +32,18 @@ const controlRecipe = async function () {
 };
 
 const controlSearchResults = async function () {
-  resultsView.renderSpinner();
   // get the search query
   const query = searchView.getQuery();
   // if invalid, return
   if (!query) return;
+  resultsView.renderSpinner();
   try {
     await model.loadSearchResults(query);
+    resultsView.setQuery(model.state.search.query);
     resultsView.render(model.state.search.results);
   } catch (err) {
-    recipeView.renderError();
+    resultsView.renderError(); // render the error
+    resultsView.setQuery(''); // reset query value of resultsView
   }
 };
 

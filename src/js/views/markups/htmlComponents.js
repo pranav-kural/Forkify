@@ -44,9 +44,11 @@ export function recipeHTML(recipe) {
           </div>
 
           <div class="recipe__user-generated">
+          <!--
             <svg>
               <use href="${icons}.svg#icon-user"></use>
             </svg>
+          -->
           </div>
           <button class="btn--round">
             <svg class="">
@@ -113,18 +115,13 @@ export const previewHTML = data => {
 function generatePreviewComponent(data) {
   return `
           <li class="preview">
-            <a class="preview__link preview__link--active" href="#${data?.id}">
+            <a class="preview__link" href="#${data?.id}">
               <figure class="preview__fig">
-                <img src="${data?.imageUrl}" alt="Test" />
+                <img src="${data?.imageUrl}" alt="${data?.title}" />
               </figure>
               <div class="preview__data">
                 <h4 class="preview__title">${data?.title}</h4>
                 <p class="preview__publisher">${data?.publisher}</p>
-                <div class="preview__user-generated">
-                  <svg>
-                    <use href="${icons}#icon-user"></use>
-                  </svg>
-                </div>
               </div>
             </a>
           </li>

@@ -10,12 +10,14 @@ export default class ParentView {
     this._parentElement = parentElement;
     this._markupGenerator = markupGenerator;
     this._defaultMessage = '';
-    this._defaultErrorMessage =
-      "We could not find the recipe you're looking for. Please try another one!";
+    this._defaultErrorMessage = 'Oops, an error has occured!';
   }
 
   // render the component on view
   render(data) {
+    if (!data || (Array.isArray(data) && data.length === 0) || data === {})
+      return this.renderError();
+
     this._clearParentEl();
     this._parentElement.insertAdjacentHTML(
       'afterbegin',

@@ -5,6 +5,8 @@ class RecipeView extends ParentView {
   constructor() {
     // set parent element
     super(document.querySelector('.recipe'), recipeHTML);
+    this._defaultErrorMessage =
+      "We could not find the recipe you're looking for. Please try another one!";
   }
 
   addEventHandler(handler) {
