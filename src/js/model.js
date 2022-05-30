@@ -2,7 +2,7 @@ import { async } from 'regenerator-runtime';
 // import helper functions
 import { transformObjPropNamesToCamelCase } from './utils';
 // import api url from config
-import { FORKIFY_API_URL } from './config';
+import { FORKIFY_API_URL, SEARCH_RESULTS_PER_PAGE } from './config';
 import { getJSON } from './helpers';
 
 // state object
@@ -11,6 +11,8 @@ export const state = {
   search: {
     query: '',
     results: {},
+    currentPage: 1,
+    resultsPerPage: SEARCH_RESULTS_PER_PAGE,
   },
 };
 
@@ -35,13 +37,19 @@ export const loadSearchResults = async function (query) {
     // get all recipes for the given query
     const data = await getJSON(`${FORKIFY_API_URL}?search=${query}`);
     // update the state
-    state.search = {
-      query: query,
-      results: data.data.recipes.map(recipe =>
-        transformObjPropNamesToCamelCase(recipe)
-      ),
-    };
+    state.search.query = query;
+    state.search.results = data.data.recipes.map(recipe =>
+      transformObjPropNamesToCamelCase(recipe)
+    );
   } catch (err) {
     throw err;
   }
+};
+
+export const getSearchResultsPage = (page = state.search.currentPage) => {
+  // update state to represent current page
+  state.search.currentPage = page;
+  const start = (page - 1) * state.search.resultsPerPage;
+  const end = page * state.search.resultsPerPage;
+  return state.search.results.slice(start, end); // return page results
 };

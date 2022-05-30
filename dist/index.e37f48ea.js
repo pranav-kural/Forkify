@@ -517,8 +517,12 @@ var _searchView = require("./views/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _resultsView = require("./views/resultsView");
 var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
+var _paginationView = require("./views/paginationView");
+var _paginationViewDefault = parcelHelpers.interopDefault(_paginationView);
 // hot reloading for parcel
-if (module.hot) module.hot.accept();
+// if (module.hot) {
+//   module.hot.accept();
+// }
 const controlRecipe = async function() {
     // get recipe Id from hash (remove first '#' character)
     const recipeId = window.location.hash.slice(1);
@@ -537,23 +541,45 @@ const controlSearchResults = async function() {
     const query = (0, _searchViewDefault.default).getQuery();
     // if invalid, return
     if (!query) return;
+    // render spinner component
     (0, _resultsViewDefault.default).renderSpinner();
+    // rendering results
     try {
+        // load search results based on query
         await _model.loadSearchResults(query);
+        // update query value in results view for a descriptive error message if needed
         (0, _resultsViewDefault.default).setQuery(_model.state.search.query);
-        (0, _resultsViewDefault.default).render(_model.state.search.results);
+        // show results on pagination
+        renderResultsAndPagination();
+    } catch (err) {
+        (0, _resultsViewDefault.default).renderError(); // render the error
+    }
+};
+const renderResultsAndPagination = (pageNum)=>{
+    // rendering results
+    try {
+        // render the results (page)
+        (0, _resultsViewDefault.default).render(_model.getSearchResultsPage(pageNum));
+        // render pagination
+        (0, _paginationViewDefault.default).render(_model.state.search);
     } catch (err) {
         (0, _resultsViewDefault.default).renderError(); // render the error
         (0, _resultsViewDefault.default).setQuery(""); // reset query value of resultsView
     }
 };
+const controlPagination = (pageNum)=>{
+    if (!pageNum) return;
+    // show results on resultsView
+    renderResultsAndPagination(pageNum);
+};
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
     (0, _searchViewDefault.default).addEventHandler(controlSearchResults);
+    (0, _paginationViewDefault.default).addEventHandler(controlPagination);
 })();
 
-},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/resultsView":"cSbZE"}],"dkJzX":[function(require,module,exports) {
+},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/resultsView":"cSbZE","./views/paginationView":"6z7bi"}],"dkJzX":[function(require,module,exports) {
 "use strict";
 var $ = require("../internals/export");
 var $includes = require("../internals/array-includes").includes;
@@ -2367,6 +2393,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
+parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
 var _regeneratorRuntime = require("regenerator-runtime");
 // import helper functions
 var _utils = require("./utils");
@@ -2377,7 +2404,9 @@ const state = {
     recipe: {},
     search: {
         query: "",
-        results: {}
+        results: {},
+        currentPage: 1,
+        resultsPerPage: (0, _config.SEARCH_RESULTS_PER_PAGE)
     }
 };
 const loadRecipe = async function(recipeId) {
@@ -2394,13 +2423,18 @@ const loadSearchResults = async function(query) {
         // get all recipes for the given query
         const data = await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}?search=${query}`);
         // update the state
-        state.search = {
-            query: query,
-            results: data.data.recipes.map((recipe)=>(0, _utils.transformObjPropNamesToCamelCase)(recipe))
-        };
+        state.search.query = query;
+        state.search.results = data.data.recipes.map((recipe)=>(0, _utils.transformObjPropNamesToCamelCase)(recipe));
     } catch (err) {
         throw err;
     }
+};
+const getSearchResultsPage = (page = state.search.currentPage)=>{
+    // update state to represent current page
+    state.search.currentPage = page;
+    const start = (page - 1) * state.search.resultsPerPage;
+    const end = page * state.search.resultsPerPage;
+    return state.search.results.slice(start, end); // return page results
 };
 
 },{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E"}],"gkKU3":[function(require,module,exports) {
@@ -2456,8 +2490,10 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "FORKIFY_API_URL", ()=>FORKIFY_API_URL);
 parcelHelpers.export(exports, "API_CALL_TIMEOUT_SECONDS", ()=>API_CALL_TIMEOUT_SECONDS);
+parcelHelpers.export(exports, "SEARCH_RESULTS_PER_PAGE", ()=>SEARCH_RESULTS_PER_PAGE);
 const FORKIFY_API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes/";
 const API_CALL_TIMEOUT_SECONDS = 10;
+const SEARCH_RESULTS_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hGI1E":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -2565,6 +2601,7 @@ parcelHelpers.export(exports, "previewHTML", ()=>previewHTML);
 parcelHelpers.export(exports, "spinnerHTML", ()=>spinnerHTML);
 parcelHelpers.export(exports, "errorHTML", ()=>errorHTML);
 parcelHelpers.export(exports, "messageHTML", ()=>messageHTML);
+parcelHelpers.export(exports, "paginationHTML", ()=>paginationHTML);
 var _iconsSvg = require("url:../../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _fractional = require("fractional");
@@ -2709,6 +2746,24 @@ const messageHTML = (message)=>`
             <p>${message}</p>
           </div>
           `;
+const paginationHTML = (prev, next)=>`
+    ${prev !== "" ? `
+    <button data-goto="${prev}" class="btn--inline pagination__btn--prev">
+            <svg class="search__icon">
+              <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
+            </svg>
+            <span>Page ${prev}</span>
+          </button>
+    ` : ""}
+    ${next !== "" ? `      
+          <button data-goto="${next}" class="btn--inline pagination__btn--next">
+            <span>Page ${next}</span>
+            <svg class="search__icon">
+              <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
+            </svg>
+          </button>
+    ` : ""}
+  `;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../../../img/icons.svg":"loVOp","fractional":"3SU56"}],"loVOp":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("hWUTQ") + "icons.dfd7a6db.svg" + "?" + Date.now();
@@ -3042,6 +3097,47 @@ class ResultsView extends (0, _parentViewDefault.default) {
 }
 exports.default = new ResultsView();
 
-},{"./parentView":"gtzxk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./markups/htmlComponents":"7VbpP"}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
+},{"./parentView":"gtzxk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./markups/htmlComponents":"7VbpP"}],"6z7bi":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _parentView = require("./parentView");
+var _parentViewDefault = parcelHelpers.interopDefault(_parentView);
+var _htmlComponents = require("./markups/htmlComponents");
+class PaginationView extends (0, _parentViewDefault.default) {
+    constructor(){
+        // set parent element
+        super(document.querySelector(".pagination"));
+        // set markup generator
+        this._markupGenerator = this._generatePagination;
+    }
+    _generatePagination(data) {
+        // calculate number of pages
+        const numPages = Math.ceil(data.results.length / data.resultsPerPage);
+        let next = "";
+        let prev = "";
+        // get current page user is on from model state data provided
+        const currentPage = Number.parseInt(data.currentPage);
+        // if on Page 1, and there are other pages
+        if (currentPage === 1 && numPages > 1) next = currentPage + 1;
+        else if (currentPage === numPages && numPages > 1) prev = numPages - 1;
+        else if (currentPage < numPages) {
+            prev = currentPage - 1;
+            next = currentPage + 1;
+        }
+        // return HTML markup result based on value of prev and next
+        return (0, _htmlComponents.paginationHTML)(prev, next);
+    }
+    addEventHandler(handler) {
+        this._parentElement.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--inline");
+            if (!btn) return;
+            // execute the handler
+            handler(btn.dataset.goto);
+        });
+    }
+}
+exports.default = new PaginationView();
+
+},{"./parentView":"gtzxk","./markups/htmlComponents":"7VbpP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
 
 //# sourceMappingURL=index.e37f48ea.js.map

@@ -157,3 +157,31 @@ export const messageHTML = message => `
             <p>${message}</p>
           </div>
           `;
+
+export const paginationHTML = (prev, next) =>
+  `
+    ${
+      prev !== ''
+        ? `
+    <button data-goto="${prev}" class="btn--inline pagination__btn--prev">
+            <svg class="search__icon">
+              <use href="${icons}#icon-arrow-left"></use>
+            </svg>
+            <span>Page ${prev}</span>
+          </button>
+    `
+        : ''
+    }
+    ${
+      next !== ''
+        ? `      
+          <button data-goto="${next}" class="btn--inline pagination__btn--next">
+            <span>Page ${next}</span>
+            <svg class="search__icon">
+              <use href="${icons}#icon-arrow-right"></use>
+            </svg>
+          </button>
+    `
+        : ''
+    }
+  `;
