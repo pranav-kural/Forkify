@@ -1,10 +1,12 @@
 // import polyfills to support old browsers
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-// import helper functions
-import { transformObjPropNamesToCamelCase } from './utils';
+// import state and functions from model
+import * as model from './model';
+// import views
+import recipeView from './views/recipeView';
 // import HTML components
-import { getRecipeHTML, spinnerHTML } from './views/htmlComponents';
+import { spinnerHTML } from './views/markups/htmlComponents';
 
 const recipeContainer = document.querySelector('.recipe');
 
@@ -35,7 +37,7 @@ const showRecipe = async function () {
   // render spinner
   renderSpinner(recipeContainer);
   try {
-    // ftech single recipe
+    // fetch single recipe
     const res = await fetch(
       `https://forkify-api.herokuapp.com/api/v2/recipes/${recipeId}`
     );
@@ -45,8 +47,12 @@ const showRecipe = async function () {
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
 
     // get recipe data and pass it on to renderRecipe function
-    // transform property names in original recipe data object to camelCase
-    renderRecipe(transformObjPropNamesToCamelCase(data.data.recipe));
+    model
+      .loadRecipe(recipeId)
+      .then(() => recipeView.render(model.state.recipe))
+      .catch(e => {
+        throw new Error(e);
+      });
   } catch (err) {
     console.error(err);
   }

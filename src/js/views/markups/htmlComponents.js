@@ -1,4 +1,4 @@
-import icons from 'url:../../img/icons.svg';
+import icons from 'url:../../../img/icons.svg';
 
 export function getRecipeHTML(recipe) {
   return `
