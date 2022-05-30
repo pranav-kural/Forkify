@@ -1,8 +1,6 @@
 import icons from 'url:../../../img/icons.svg';
 import Fraction from 'fractional';
 
-console.log('Fraction', Fraction);
-
 export function getRecipeHTML(recipe) {
   return `
         <figure class="recipe__fig">
@@ -60,48 +58,7 @@ export function getRecipeHTML(recipe) {
         <div class="recipe__ingredients">
           <h2 class="heading--2">Recipe ingredients</h2>
           <ul class="recipe__ingredient-list">
-            ${recipe.ingredients
-              .map(ing => {
-                return `
-              <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">${
-                ing?.quantity
-                  ? new Fraction.Fraction(ing?.quantity).toString()
-                  : ''
-              }</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">${ing?.unit}</span>
-                ${ing?.description}
-              </div>
-            </li>
-              `;
-              })
-              .join('')}
-
-            <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">1000</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">g</span>
-                pasta
-              </div>
-            </li>
-
-            <li class="recipe__ingredient">
-              <svg class="recipe__icon">
-                <use href="src/img/icons.svg#icon-check"></use>
-              </svg>
-              <div class="recipe__quantity">0.5</div>
-              <div class="recipe__description">
-                <span class="recipe__unit">cup</span>
-                ricotta cheese
-              </div>
-            </li>
+            ${generateIngredientsComponent(recipe.ingredients)}
           </ul>
         </div>
 
@@ -126,6 +83,27 @@ export function getRecipeHTML(recipe) {
           </a>
         </div>
   `;
+}
+
+function generateIngredientsComponent(recipeIngredients) {
+  return recipeIngredients
+    .map(ing => {
+      return `
+        <li class="recipe__ingredient">
+        <svg class="recipe__icon">
+          <use href="src/img/icons.svg#icon-check"></use>
+        </svg>
+        <div class="recipe__quantity">${
+          ing?.quantity ? new Fraction.Fraction(ing?.quantity).toString() : ''
+        }</div>
+        <div class="recipe__description">
+          <span class="recipe__unit">${ing?.unit}</span>
+          ${ing?.description}
+        </div>
+      </li>
+        `;
+    })
+    .join('');
 }
 
 export const spinnerHTML = `
