@@ -1,4 +1,7 @@
 import icons from 'url:../../../img/icons.svg';
+import Fraction from 'fractional';
+
+console.log('Fraction', Fraction);
 
 export function getRecipeHTML(recipe) {
   return `
@@ -64,7 +67,11 @@ export function getRecipeHTML(recipe) {
               <svg class="recipe__icon">
                 <use href="src/img/icons.svg#icon-check"></use>
               </svg>
-              <div class="recipe__quantity">${ing?.quantity}</div>
+              <div class="recipe__quantity">${
+                ing?.quantity
+                  ? new Fraction.Fraction(ing?.quantity).toString()
+                  : ''
+              }</div>
               <div class="recipe__description">
                 <span class="recipe__unit">${ing?.unit}</span>
                 ${ing?.description}
