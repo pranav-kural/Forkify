@@ -524,6 +524,7 @@ const controlRecipe = async function() {
     // get recipe data and pass it on to renderRecipe function
     _model.loadRecipe(recipeId).then(()=>(0, _recipeViewDefault.default).render(_model.state.recipe)).catch((err)=>{
         console.error(err);
+        (0, _recipeViewDefault.default).renderError();
     });
 };
 // initialize event handler
@@ -2359,8 +2360,7 @@ const loadRecipe = async function(recipeId) {
         // transform property names in original recipe data object to camelCase
         state.recipe = (0, _utils.transformObjPropNamesToCamelCase)(await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}${recipeId}`).then((responseData)=>responseData.data.recipe));
     } catch (err) {
-        console.error(err);
-        throw new Error(err);
+        throw err;
     }
 };
 
@@ -2442,7 +2442,7 @@ const getJSON = async function(url) {
         // return response data
         return data;
     } catch (err) {
-        throw new Error(err);
+        throw err;
     }
 };
 const timeout = function(s) {
@@ -2459,6 +2459,8 @@ parcelHelpers.defineInteropFlag(exports);
 var _htmlComponents = require("./markups/htmlComponents");
 class RecipeView {
     #parentElement = document.querySelector(".recipe");
+    #defaultMessage = "";
+    #defaultErrorMessage = "We could not find the recipe you're looking for. Please try another one!";
     // render the recipe component on view
     render(recipeData) {
         this.#clear();
@@ -2473,6 +2475,14 @@ class RecipeView {
         this.#clear();
         // display spinner
         this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
+    }
+    renderError(errorMessage = this.#defaultErrorMessage) {
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.errorHTML)(errorMessage));
+    }
+    renderMessage(message = this.#defaultMessage) {
+        this.#clear();
+        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.messageHTML)(message));
     }
     addEventHandler(handler) {
         // add event listeners for updating recipe on view
@@ -2490,6 +2500,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "getRecipeHTML", ()=>getRecipeHTML);
 parcelHelpers.export(exports, "spinnerHTML", ()=>spinnerHTML);
+parcelHelpers.export(exports, "errorHTML", ()=>errorHTML);
+parcelHelpers.export(exports, "messageHTML", ()=>messageHTML);
 var _iconsSvg = require("url:../../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _fractional = require("fractional");
@@ -2594,6 +2606,26 @@ const spinnerHTML = `
 </svg>
 </div>
 `;
+const errorHTML = (errorMessage)=>`
+          <div class="error">
+            <div>
+              <svg>
+                <use href="${0, _iconsSvgDefault.default}#icon-alert-triangle"></use>
+              </svg>
+            </div>
+            <p>${errorMessage}</p>
+          </div>
+          `;
+const messageHTML = (message)=>`
+          <div class="message">
+            <div>
+              <svg>
+                <use href="${0, _iconsSvgDefault.default}#icon-smile"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div>
+          `;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../../../img/icons.svg":"loVOp","fractional":"3SU56"}],"loVOp":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("hWUTQ") + "icons.dfd7a6db.svg" + "?" + Date.now();

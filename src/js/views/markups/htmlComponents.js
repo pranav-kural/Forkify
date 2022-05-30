@@ -113,3 +113,25 @@ export const spinnerHTML = `
 </svg>
 </div>
 `;
+
+export const errorHTML = errorMessage => `
+          <div class="error">
+            <div>
+              <svg>
+                <use href="${icons}#icon-alert-triangle"></use>
+              </svg>
+            </div>
+            <p>${errorMessage}</p>
+          </div>
+          `;
+
+export const messageHTML = message => `
+          <div class="message">
+            <div>
+              <svg>
+                <use href="${icons}#icon-smile"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div>
+          `;

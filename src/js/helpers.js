@@ -17,7 +17,7 @@ export const getJSON = async function (url) {
     // return response data
     return data;
   } catch (err) {
-    throw new Error(err);
+    throw err;
   }
 };
 

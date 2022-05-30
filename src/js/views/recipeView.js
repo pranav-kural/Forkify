@@ -1,7 +1,15 @@
-import { getRecipeHTML, spinnerHTML } from './markups/htmlComponents';
+import {
+  errorHTML,
+  getRecipeHTML,
+  messageHTML,
+  spinnerHTML,
+} from './markups/htmlComponents';
 
 class RecipeView {
   #parentElement = document.querySelector('.recipe');
+  #defaultMessage = '';
+  #defaultErrorMessage =
+    "We could not find the recipe you're looking for. Please try another one!";
 
   // render the recipe component on view
   render(recipeData) {
@@ -22,6 +30,19 @@ class RecipeView {
     this.#clear();
     // display spinner
     this.#parentElement.insertAdjacentHTML('afterbegin', spinnerHTML);
+  }
+
+  renderError(errorMessage = this.#defaultErrorMessage) {
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML(
+      'afterbegin',
+      errorHTML(errorMessage)
+    );
+  }
+
+  renderMessage(message = this.#defaultMessage) {
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('afterbegin', messageHTML(message));
   }
 
   addEventHandler(handler) {
