@@ -1,7 +1,7 @@
 import icons from 'url:../../../img/icons.svg';
 import Fraction from 'fractional';
 
-export function getRecipeHTML(recipe) {
+export function recipeHTML(recipe) {
   return `
         <figure class="recipe__fig">
           <img src="${recipe.imageUrl}" alt="Tomato" class="recipe__img" />
@@ -32,12 +32,12 @@ export function getRecipeHTML(recipe) {
             <div class="recipe__info-buttons">
               <button class="btn--tiny btn--increase-servings">
                 <svg>
-                  <use href="src/img/icons.svg#icon-minus-circle"></use>
+                  <use href="${icons}#icon-minus-circle"></use>
                 </svg>
               </button>
               <button class="btn--tiny btn--increase-servings">
                 <svg>
-                  <use href="src/img/icons.svg#icon-plus-circle"></use>
+                  <use href="${icons}.svg#icon-plus-circle"></use>
                 </svg>
               </button>
             </div>
@@ -45,12 +45,12 @@ export function getRecipeHTML(recipe) {
 
           <div class="recipe__user-generated">
             <svg>
-              <use href="src/img/icons.svg#icon-user"></use>
+              <use href="${icons}.svg#icon-user"></use>
             </svg>
           </div>
           <button class="btn--round">
             <svg class="">
-              <use href="src/img/icons.svg#icon-bookmark-fill"></use>
+              <use href="${icons}.svg#icon-bookmark-fill"></use>
             </svg>
           </button>
         </div>
@@ -78,7 +78,7 @@ export function getRecipeHTML(recipe) {
           >
             <span>Directions</span>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-right"></use>
+              <use href="${icons}.svg#icon-arrow-right"></use>
             </svg>
           </a>
         </div>
@@ -91,7 +91,7 @@ function generateIngredientsComponent(recipeIngredients) {
       return `
         <li class="recipe__ingredient">
         <svg class="recipe__icon">
-          <use href="src/img/icons.svg#icon-check"></use>
+          <use href="${icons}.svg#icon-check"></use>
         </svg>
         <div class="recipe__quantity">${
           ing?.quantity ? new Fraction.Fraction(ing?.quantity).toString() : ''
@@ -104,6 +104,31 @@ function generateIngredientsComponent(recipeIngredients) {
         `;
     })
     .join('');
+}
+
+export const previewHTML = data => {
+  return data.map(recipe => generatePreviewComponent(recipe)).join('');
+};
+
+function generatePreviewComponent(data) {
+  return `
+          <li class="preview">
+            <a class="preview__link preview__link--active" href="#${data?.id}">
+              <figure class="preview__fig">
+                <img src="${data?.imageUrl}" alt="Test" />
+              </figure>
+              <div class="preview__data">
+                <h4 class="preview__title">${data?.title}</h4>
+                <p class="preview__publisher">${data?.publisher}</p>
+                <div class="preview__user-generated">
+                  <svg>
+                    <use href="${icons}#icon-user"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </li>
+  `;
 }
 
 export const spinnerHTML = `

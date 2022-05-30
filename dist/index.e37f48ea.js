@@ -515,6 +515,8 @@ var _recipeView = require("./views/recipeView");
 var _recipeViewDefault = parcelHelpers.interopDefault(_recipeView);
 var _searchView = require("./views/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
+var _resultsView = require("./views/resultsView");
+var _resultsViewDefault = parcelHelpers.interopDefault(_resultsView);
 ///////////////////////////////////////
 const controlRecipe = async function() {
     // get recipe Id from hash (remove first '#' character)
@@ -530,25 +532,25 @@ const controlRecipe = async function() {
     });
 };
 const controlSearchResults = async function() {
+    (0, _resultsViewDefault.default).renderSpinner();
     // get the search query
     const query = (0, _searchViewDefault.default).getQuery();
     // if invalid, return
     if (!query) return;
     try {
         await _model.loadSearchResults(query);
-        console.dir(_model.state.search);
+        (0, _resultsViewDefault.default).render(_model.state.search.results);
     } catch (err) {
         (0, _recipeViewDefault.default).renderError();
     }
 };
-controlSearchResults();
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
     (0, _searchViewDefault.default).addEventHandler(controlSearchResults);
 })();
 
-},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM"}],"dkJzX":[function(require,module,exports) {
+},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/resultsView":"cSbZE"}],"dkJzX":[function(require,module,exports) {
 "use strict";
 var $ = require("../internals/export");
 var $includes = require("../internals/array-includes").includes;
@@ -2490,33 +2492,13 @@ const timeout = function(s) {
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+var _parentView = require("./parentView");
+var _parentViewDefault = parcelHelpers.interopDefault(_parentView);
 var _htmlComponents = require("./markups/htmlComponents");
-class RecipeView {
-    #parentElement = document.querySelector(".recipe");
-    #defaultMessage = "";
-    #defaultErrorMessage = "We could not find the recipe you're looking for. Please try another one!";
-    // render the recipe component on view
-    render(recipeData) {
-        this.#clear();
-        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.getRecipeHTML)(recipeData));
-    }
-    // clear the parent element
-     #clear() {
-        // clear recipe countainer
-        this.#parentElement.innerHTML = "";
-    }
-    renderSpinner() {
-        this.#clear();
-        // display spinner
-        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
-    }
-    renderError(errorMessage = this.#defaultErrorMessage) {
-        this.#clear();
-        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.errorHTML)(errorMessage));
-    }
-    renderMessage(message = this.#defaultMessage) {
-        this.#clear();
-        this.#parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.messageHTML)(message));
+class RecipeView extends (0, _parentViewDefault.default) {
+    constructor(){
+        // set parent element
+        super(document.querySelector(".recipe"), (0, _htmlComponents.recipeHTML));
     }
     addEventHandler(handler) {
         // add event listeners for updating recipe on view
@@ -2529,10 +2511,52 @@ class RecipeView {
 // export a new instance of recipeView
 exports.default = new RecipeView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./markups/htmlComponents":"7VbpP"}],"7VbpP":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./parentView":"gtzxk","./markups/htmlComponents":"7VbpP"}],"gtzxk":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getRecipeHTML", ()=>getRecipeHTML);
+var _htmlComponents = require("./markups/htmlComponents");
+class ParentView {
+    _parentElement;
+    _defaultMessage;
+    _defaultErrorMessage;
+    _markupGenerator;
+    constructor(parentElement, markupGenerator){
+        this._parentElement = parentElement;
+        this._markupGenerator = markupGenerator;
+        this._defaultMessage = "";
+        this._defaultErrorMessage = "We could not find the recipe you're looking for. Please try another one!";
+    }
+    // render the component on view
+    render(data) {
+        this._clearParentEl();
+        this._parentElement.insertAdjacentHTML("afterbegin", this._markupGenerator(data));
+    }
+    // clear the parent element
+    _clearParentEl() {
+        // clear recipe countainer
+        this._parentElement.innerHTML = "";
+    }
+    renderSpinner() {
+        this._clearParentEl();
+        // display spinner
+        this._parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.spinnerHTML));
+    }
+    renderError(errorMessage = this._defaultErrorMessage) {
+        this._clearParentEl();
+        this._parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.errorHTML)(errorMessage));
+    }
+    renderMessage(message = this._defaultMessage) {
+        this._clearParentEl();
+        this._parentElement.insertAdjacentHTML("afterbegin", (0, _htmlComponents.messageHTML)(message));
+    }
+}
+exports.default = ParentView;
+
+},{"./markups/htmlComponents":"7VbpP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7VbpP":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "recipeHTML", ()=>recipeHTML);
+parcelHelpers.export(exports, "previewHTML", ()=>previewHTML);
 parcelHelpers.export(exports, "spinnerHTML", ()=>spinnerHTML);
 parcelHelpers.export(exports, "errorHTML", ()=>errorHTML);
 parcelHelpers.export(exports, "messageHTML", ()=>messageHTML);
@@ -2540,7 +2564,7 @@ var _iconsSvg = require("url:../../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 var _fractional = require("fractional");
 var _fractionalDefault = parcelHelpers.interopDefault(_fractional);
-function getRecipeHTML(recipe) {
+function recipeHTML(recipe) {
     return `
         <figure class="recipe__fig">
           <img src="${recipe.imageUrl}" alt="Tomato" class="recipe__img" />
@@ -2567,12 +2591,12 @@ function getRecipeHTML(recipe) {
             <div class="recipe__info-buttons">
               <button class="btn--tiny btn--increase-servings">
                 <svg>
-                  <use href="src/img/icons.svg#icon-minus-circle"></use>
+                  <use href="${0, _iconsSvgDefault.default}#icon-minus-circle"></use>
                 </svg>
               </button>
               <button class="btn--tiny btn--increase-servings">
                 <svg>
-                  <use href="src/img/icons.svg#icon-plus-circle"></use>
+                  <use href="${0, _iconsSvgDefault.default}.svg#icon-plus-circle"></use>
                 </svg>
               </button>
             </div>
@@ -2580,12 +2604,12 @@ function getRecipeHTML(recipe) {
 
           <div class="recipe__user-generated">
             <svg>
-              <use href="src/img/icons.svg#icon-user"></use>
+              <use href="${0, _iconsSvgDefault.default}.svg#icon-user"></use>
             </svg>
           </div>
           <button class="btn--round">
             <svg class="">
-              <use href="src/img/icons.svg#icon-bookmark-fill"></use>
+              <use href="${0, _iconsSvgDefault.default}.svg#icon-bookmark-fill"></use>
             </svg>
           </button>
         </div>
@@ -2611,7 +2635,7 @@ function getRecipeHTML(recipe) {
           >
             <span>Directions</span>
             <svg class="search__icon">
-              <use href="src/img/icons.svg#icon-arrow-right"></use>
+              <use href="${0, _iconsSvgDefault.default}.svg#icon-arrow-right"></use>
             </svg>
           </a>
         </div>
@@ -2622,7 +2646,7 @@ function generateIngredientsComponent(recipeIngredients) {
         return `
         <li class="recipe__ingredient">
         <svg class="recipe__icon">
-          <use href="src/img/icons.svg#icon-check"></use>
+          <use href="${0, _iconsSvgDefault.default}.svg#icon-check"></use>
         </svg>
         <div class="recipe__quantity">${ing?.quantity ? new (0, _fractionalDefault.default).Fraction(ing?.quantity).toString() : ""}</div>
         <div class="recipe__description">
@@ -2632,6 +2656,29 @@ function generateIngredientsComponent(recipeIngredients) {
       </li>
         `;
     }).join("");
+}
+const previewHTML = (data)=>{
+    return data.map((recipe)=>generatePreviewComponent(recipe)).join("");
+};
+function generatePreviewComponent(data) {
+    return `
+          <li class="preview">
+            <a class="preview__link preview__link--active" href="#${data?.id}">
+              <figure class="preview__fig">
+                <img src="${data?.imageUrl}" alt="Test" />
+              </figure>
+              <div class="preview__data">
+                <h4 class="preview__title">${data?.title}</h4>
+                <p class="preview__publisher">${data?.publisher}</p>
+                <div class="preview__user-generated">
+                  <svg>
+                    <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </li>
+  `;
 }
 const spinnerHTML = `
 <div class="spinner">
@@ -2973,6 +3020,20 @@ class SearchView {
 // export an instance
 exports.default = new SearchView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cSbZE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _parentView = require("./parentView");
+var _parentViewDefault = parcelHelpers.interopDefault(_parentView);
+var _htmlComponents = require("./markups/htmlComponents");
+class ResultsView extends (0, _parentViewDefault.default) {
+    constructor(){
+        // set parent element
+        super(document.querySelector(".results"), (0, _htmlComponents.previewHTML));
+    }
+}
+exports.default = new ResultsView();
+
+},{"./parentView":"gtzxk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./markups/htmlComponents":"7VbpP"}]},["2kSJi","aenu9"], "aenu9", "parcelRequire3a11")
 
 //# sourceMappingURL=index.e37f48ea.js.map
