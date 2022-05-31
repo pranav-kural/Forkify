@@ -579,7 +579,7 @@ const controlPagination = (pageNum)=>{
     (0, _paginationViewDefault.default).addEventHandler(controlPagination);
 })();
 
-},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./views/searchView":"9OQAM","./views/resultsView":"cSbZE","./views/paginationView":"6z7bi"}],"dkJzX":[function(require,module,exports) {
+},{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/searchView":"9OQAM","./views/resultsView":"cSbZE","./views/paginationView":"6z7bi","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
 "use strict";
 var $ = require("../internals/export");
 var $includes = require("../internals/array-includes").includes;
@@ -2437,7 +2437,25 @@ const getSearchResultsPage = (page = state.search.currentPage)=>{
     return state.search.results.slice(start, end); // return page results
 };
 
-},{"regenerator-runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E"}],"gkKU3":[function(require,module,exports) {
+},{"regenerator-runtime":"dXNgZ","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"72Dku":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+/**
+ * Utility functions which are not part of core application logic but used as helpers
+ */ // convert object's property names from underscore format to camelCase
+parcelHelpers.export(exports, "transformObjPropNamesToCamelCase", ()=>transformObjPropNamesToCamelCase);
+function transformObjPropNamesToCamelCase(obj) {
+    const transformFromUnderscore = (keyName)=>{
+        // if provided keyName invalid or doesn't contain underscore
+        if (!keyName || !keyName?.includes("_")) return keyName;
+        return keyName.split("_").map((el, index)=>index > 0 ? el.charAt(0).toUpperCase() + el.slice(1) : el.charAt(0).toLowerCase() + el.slice(1)).join("");
+    };
+    let newObj = {};
+    for(const key in obj)newObj[transformFromUnderscore(key)] = obj[key];
+    return newObj;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2467,25 +2485,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"72Dku":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-/**
- * Utility functions which are not part of core application logic but used as helpers
- */ // convert object's property names from underscore format to camelCase
-parcelHelpers.export(exports, "transformObjPropNamesToCamelCase", ()=>transformObjPropNamesToCamelCase);
-function transformObjPropNamesToCamelCase(obj) {
-    const transformFromUnderscore = (keyName)=>{
-        // if provided keyName invalid or doesn't contain underscore
-        if (!keyName || !keyName?.includes("_")) return keyName;
-        return keyName.split("_").map((el, index)=>index > 0 ? el.charAt(0).toUpperCase() + el.slice(1) : el.charAt(0).toLowerCase() + el.slice(1)).join("");
-    };
-    let newObj = {};
-    for(const key in obj)newObj[transformFromUnderscore(key)] = obj[key];
-    return newObj;
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
+},{}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "FORKIFY_API_URL", ()=>FORKIFY_API_URL);
@@ -2528,7 +2528,7 @@ const timeout = function(s) {
     });
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs"}],"l60JC":[function(require,module,exports) {
+},{"./config":"k5Hzs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l60JC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _parentView = require("./parentView");
@@ -2551,7 +2551,7 @@ class RecipeView extends (0, _parentViewDefault.default) {
 // export a new instance of recipeView
 exports.default = new RecipeView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./parentView":"gtzxk","./markups/htmlComponents":"7VbpP"}],"gtzxk":[function(require,module,exports) {
+},{"./parentView":"gtzxk","./markups/htmlComponents":"7VbpP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gtzxk":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _htmlComponents = require("./markups/htmlComponents");
@@ -2765,7 +2765,7 @@ const paginationHTML = (prev, next)=>`
     ` : ""}
   `;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../../../img/icons.svg":"loVOp","fractional":"3SU56"}],"loVOp":[function(require,module,exports) {
+},{"url:../../../img/icons.svg":"loVOp","fractional":"3SU56","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"loVOp":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("hWUTQ") + "icons.dfd7a6db.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -3097,7 +3097,7 @@ class ResultsView extends (0, _parentViewDefault.default) {
 }
 exports.default = new ResultsView();
 
-},{"./parentView":"gtzxk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./markups/htmlComponents":"7VbpP"}],"6z7bi":[function(require,module,exports) {
+},{"./parentView":"gtzxk","./markups/htmlComponents":"7VbpP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6z7bi":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _parentView = require("./parentView");

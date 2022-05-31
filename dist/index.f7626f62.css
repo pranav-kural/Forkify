@@ -517,9 +517,13 @@ body {
 
 .copyright {
   color: #918581;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   margin-top: 4rem;
   padding: 0 3.5rem;
   font-size: 1.2rem;
+  display: flex;
 }
 
 .copyright .udemy-link:link, .copyright .udemy-link:visited, .copyright .github-link:link, .copyright .github-link:visited {
