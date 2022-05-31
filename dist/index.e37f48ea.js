@@ -572,11 +572,18 @@ const controlPagination = (pageNum)=>{
     // show results on resultsView
     renderResultsAndPagination(pageNum);
 };
+const controlServings = (newServings)=>{
+    // Update recipe servings (in state)
+    _model.updateServings(newServings);
+    // Update the recipe view
+    (0, _recipeViewDefault.default).render(_model.state.recipe);
+};
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
     (0, _searchViewDefault.default).addEventHandler(controlSearchResults);
     (0, _paginationViewDefault.default).addEventHandler(controlPagination);
+    (0, _recipeViewDefault.default).handleServingsUpdate(controlServings);
 })();
 
 },{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/searchView":"9OQAM","./views/resultsView":"cSbZE","./views/paginationView":"6z7bi","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
@@ -2394,6 +2401,7 @@ parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
+parcelHelpers.export(exports, "updateServings", ()=>updateServings);
 var _regeneratorRuntime = require("regenerator-runtime");
 // import helper functions
 var _utils = require("./utils");
@@ -2435,6 +2443,12 @@ const getSearchResultsPage = (page = state.search.currentPage)=>{
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
     return state.search.results.slice(start, end); // return page results
+};
+const updateServings = (newServings)=>{
+    state.recipe.ingredients.forEach((ing)=>{
+        ing.quantity = ing.quantity * newServings / state.recipe.servings;
+    });
+    state.recipe.servings = newServings;
 };
 
 },{"regenerator-runtime":"dXNgZ","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"72Dku":[function(require,module,exports) {
@@ -2547,6 +2561,14 @@ class RecipeView extends (0, _parentViewDefault.default) {
             "load"
         ].forEach((e)=>addEventListener(e, handler));
     }
+    handleServingsUpdate(handler) {
+        this._parentElement.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--update-servings");
+            if (!btn || btn.dataset.updateTo < 0) return;
+            // call provided handler function providing new serving quantity
+            handler(btn.dataset.updateTo);
+        });
+    }
 }
 // export a new instance of recipeView
 exports.default = new RecipeView();
@@ -2631,12 +2653,12 @@ function recipeHTML(recipe) {
             <span class="recipe__info-text">servings</span>
 
             <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${Number.parseInt(recipe.servings) - 1}">
                 <svg>
                   <use href="${0, _iconsSvgDefault.default}#icon-minus-circle"></use>
                 </svg>
               </button>
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${Number.parseInt(recipe.servings) + 1}">
                 <svg>
                   <use href="${0, _iconsSvgDefault.default}.svg#icon-plus-circle"></use>
                 </svg>

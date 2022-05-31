@@ -30,12 +30,16 @@ export function recipeHTML(recipe) {
             <span class="recipe__info-text">servings</span>
 
             <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${
+                Number.parseInt(recipe.servings) - 1
+              }">
                 <svg>
                   <use href="${icons}#icon-minus-circle"></use>
                 </svg>
               </button>
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-update-to="${
+                Number.parseInt(recipe.servings) + 1
+              }">
                 <svg>
                   <use href="${icons}.svg#icon-plus-circle"></use>
                 </svg>

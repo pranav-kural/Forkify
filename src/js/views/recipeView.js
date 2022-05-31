@@ -13,6 +13,15 @@ class RecipeView extends ParentView {
     // add event listeners for updating recipe on view
     ['hashchange', 'load'].forEach(e => addEventListener(e, handler));
   }
+
+  handleServingsUpdate(handler) {
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--update-servings');
+      if (!btn || btn.dataset.updateTo < 0) return;
+      // call provided handler function providing new serving quantity
+      handler(btn.dataset.updateTo);
+    });
+  }
 }
 
 // export a new instance of recipeView

@@ -72,9 +72,17 @@ const controlPagination = pageNum => {
   renderResultsAndPagination(pageNum);
 };
 
+const controlServings = newServings => {
+  // Update recipe servings (in state)
+  model.updateServings(newServings);
+  // Update the recipe view
+  recipeView.render(model.state.recipe);
+};
+
 // initialize event handler
 (function () {
   recipeView.addEventHandler(controlRecipe);
   searchView.addEventHandler(controlSearchResults);
   paginationView.addEventHandler(controlPagination);
+  recipeView.handleServingsUpdate(controlServings);
 })();
