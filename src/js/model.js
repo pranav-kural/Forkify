@@ -41,6 +41,7 @@ export const loadSearchResults = async function (query) {
     state.search.results = data.data.recipes.map(recipe =>
       transformObjPropNamesToCamelCase(recipe)
     );
+    state.search.currentPage = 1;
   } catch (err) {
     throw err;
   }

@@ -2436,6 +2436,7 @@ const loadSearchResults = async function(query) {
         // update the state
         state.search.query = query;
         state.search.results = data.data.recipes.map((recipe)=>(0, _utils.transformObjPropNamesToCamelCase)(recipe));
+        state.search.currentPage = 1;
     } catch (err) {
         throw err;
     }
