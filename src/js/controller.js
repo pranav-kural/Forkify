@@ -22,6 +22,8 @@ const controlRecipe = async function () {
   if (!recipeId) return;
   // render spinner
   recipeView.renderSpinner();
+  // Update results view to mark selected search result
+  resultsView.update(model.getSearchResultsPage());
   // get recipe data and pass it on to renderRecipe function
   model
     .loadRecipe(recipeId)

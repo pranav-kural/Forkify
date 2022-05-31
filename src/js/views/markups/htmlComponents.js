@@ -117,15 +117,22 @@ export const previewHTML = data => {
 };
 
 function generatePreviewComponent(data) {
+  // gaurd clause
+  if (!data) return;
+  // get id of the recipe currently being displayed
+  const currentId = window.location.hash.slice(1);
+
   return `
           <li class="preview">
-            <a class="preview__link" href="#${data?.id}">
+            <a class="preview__link ${
+              data.id === currentId ? 'preview__link--active' : ''
+            }" href="#${data.id}">
               <figure class="preview__fig">
-                <img src="${data?.imageUrl}" alt="${data?.title}" />
+                <img src="${data.imageUrl}" alt="${data.title}" />
               </figure>
               <div class="preview__data">
-                <h4 class="preview__title">${data?.title}</h4>
-                <p class="preview__publisher">${data?.publisher}</p>
+                <h4 class="preview__title">${data.title}</h4>
+                <p class="preview__publisher">${data.publisher}</p>
               </div>
             </a>
           </li>

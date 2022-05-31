@@ -47,6 +47,8 @@ export const loadSearchResults = async function (query) {
 };
 
 export const getSearchResultsPage = (page = state.search.currentPage) => {
+  // if no results present, return
+  if (state.search.results === {}) return;
   // update state to represent current page
   state.search.currentPage = page;
   const start = (page - 1) * state.search.resultsPerPage;

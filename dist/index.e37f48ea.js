@@ -530,6 +530,8 @@ const controlRecipe = async function() {
     if (!recipeId) return;
     // render spinner
     (0, _recipeViewDefault.default).renderSpinner();
+    // Update results view to mark selected search result
+    (0, _resultsViewDefault.default).update(_model.getSearchResultsPage());
     // get recipe data and pass it on to renderRecipe function
     _model.loadRecipe(recipeId).then(()=>(0, _recipeViewDefault.default).render(_model.state.recipe)).catch((err)=>{
         console.error(err);
@@ -2439,6 +2441,8 @@ const loadSearchResults = async function(query) {
     }
 };
 const getSearchResultsPage = (page = state.search.currentPage)=>{
+    // if no results present, return
+    if (state.search.results === {}) return;
     // update state to represent current page
     state.search.currentPage = page;
     const start = (page - 1) * state.search.resultsPerPage;
@@ -2565,7 +2569,7 @@ class RecipeView extends (0, _parentViewDefault.default) {
     handleServingsUpdate(handler) {
         this._parentElement.addEventListener("click", (e)=>{
             const btn = e.target.closest(".btn--update-servings");
-            if (!btn || btn.dataset.updateTo < 0) return;
+            if (!btn || btn.dataset.updateTo <= 0) return;
             // call provided handler function providing new serving quantity
             handler(btn.dataset.updateTo);
         });
@@ -2746,15 +2750,19 @@ const previewHTML = (data)=>{
     return data.map((recipe)=>generatePreviewComponent(recipe)).join("");
 };
 function generatePreviewComponent(data) {
+    // gaurd clause
+    if (!data) return;
+    // get id of the recipe currently being displayed
+    const currentId = window.location.hash.slice(1);
     return `
           <li class="preview">
-            <a class="preview__link" href="#${data?.id}">
+            <a class="preview__link ${data.id === currentId ? "preview__link--active" : ""}" href="#${data.id}">
               <figure class="preview__fig">
-                <img src="${data?.imageUrl}" alt="${data?.title}" />
+                <img src="${data.imageUrl}" alt="${data.title}" />
               </figure>
               <div class="preview__data">
-                <h4 class="preview__title">${data?.title}</h4>
-                <p class="preview__publisher">${data?.publisher}</p>
+                <h4 class="preview__title">${data.title}</h4>
+                <p class="preview__publisher">${data.publisher}</p>
               </div>
             </a>
           </li>
