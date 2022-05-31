@@ -25,6 +25,40 @@ export default class ParentView {
     );
   }
 
+  update(data) {
+    if (!data || (Array.isArray(data) && data.length === 0) || data === {})
+      return this.renderError();
+    // store new markup
+    const newMarkup = this._markupGenerator(data);
+    // create virtual DOM elements
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    // get new Elements
+    const newElements = Array.from(newDOM.querySelectorAll('*'));
+    // get current DOM elements
+    const currentElements = Array.from(
+      this._parentElement.querySelectorAll('*')
+    );
+
+    newElements.forEach((newEl, i) => {
+      const currentEl = currentElements[i];
+
+      // update text content of elements that have changed
+      if (
+        !newEl.isEqualNode(currentEl) &&
+        newEl.firstChild?.nodeValue.trim() !== ''
+      ) {
+        // replace just the text
+        currentEl.textContent = newEl.textContent;
+      }
+
+      if (!newEl.isEqualNode(currentEl)) {
+        Array.from(newEl.attributes).forEach(attr =>
+          currentEl.setAttribute(attr.name, attr.value)
+        );
+      }
+    });
+  }
+
   // clear the parent element
   _clearParentEl() {
     // clear recipe countainer
