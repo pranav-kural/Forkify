@@ -10,6 +10,7 @@ import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
 import bookmarksView from './views/bookmarksView';
+import { isEmptyObject } from './helpers';
 
 const controlRecipe = async function () {
   // get recipe Id from hash (remove first '#' character)
@@ -19,7 +20,10 @@ const controlRecipe = async function () {
   // render spinner
   recipeView.renderSpinner();
   // Update results view to mark selected search result
-  resultsView.update(model.getSearchResultsPage());
+  if (!isEmptyObject(model.state.search.results)) {
+    resultsView.update(model.getSearchResultsPage());
+  }
+
   // update bookmarks
   bookmarksView.update(model.state.bookmarks);
   // get recipe data and pass it on to renderRecipe function
@@ -39,7 +43,6 @@ const controlSearchResults = async function () {
   if (!query) return;
   // render spinner component
   resultsView.renderSpinner();
-
   // rendering results
   try {
     // load search results based on query
@@ -91,6 +94,10 @@ const controlBookmarks = () => {
   bookmarksView.render(model.state.bookmarks);
 };
 
+const controlBookmarksView = () => bookmarksView.render(model.state.bookmarks);
+
+const clearBookmarks = () => localStorage.clear('bookmarks');
+
 // initialize event handler
 (function () {
   recipeView.addEventHandler(controlRecipe);
@@ -98,4 +105,5 @@ const controlBookmarks = () => {
   paginationView.addEventHandler(controlPagination);
   recipeView.handleServingsUpdate(controlServings);
   recipeView.addBookmarksHandler(controlBookmarks);
+  bookmarksView.bookmarksRenderHandler(controlBookmarksView);
 })();

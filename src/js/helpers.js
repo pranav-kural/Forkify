@@ -28,3 +28,8 @@ export const timeout = function (s) {
     }, s * 1000);
   });
 };
+
+export const isEmptyObject = obj => {
+  for (let val in obj) return false;
+  return true;
+};
