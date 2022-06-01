@@ -14,6 +14,7 @@ export const state = {
     currentPage: 1,
     resultsPerPage: SEARCH_RESULTS_PER_PAGE,
   },
+  bookmarks: [],
 };
 
 // fetch recipe data
@@ -25,6 +26,10 @@ export const loadRecipe = async function (recipeId) {
       await getJSON(`${FORKIFY_API_URL}${recipeId}`).then(
         responseData => responseData.data.recipe
       )
+    );
+
+    state.recipe.bookmarked = state.bookmarks.some(
+      bookmarkedRecipe => bookmarkedRecipe.id === recipeId
     );
   } catch (err) {
     throw err;
@@ -49,12 +54,12 @@ export const loadSearchResults = async function (query) {
 
 export const getSearchResultsPage = (page = state.search.currentPage) => {
   // if no results present, return
-  if (state.search.results === {}) return;
+  if (!state.search.results || state.search.results === {}) return;
   // update state to represent current page
   state.search.currentPage = page;
   const start = (page - 1) * state.search.resultsPerPage;
   const end = page * state.search.resultsPerPage;
-  return state.search.results.slice(start, end); // return page results
+  if (state.search.results.slice) return state.search.results.slice(start, end); // return page results
 };
 
 export const updateServings = newServings => {
@@ -63,4 +68,19 @@ export const updateServings = newServings => {
   });
 
   state.recipe.servings = newServings;
+};
+
+export const addBookmark = recipe => {
+  // add recipe to the bookmarks
+  state.bookmarks.push(recipe);
+  // mark current recipe as bookmark
+  if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+
+export const deleteBookmark = recipe => {
+  const index = state.bookmarks.findIndex(el => el.id === recipe.id);
+  state.bookmarks.splice(index, 1);
+
+  // remove the bookmark
+  if (recipe.id === state.recipe.id) state.recipe.bookmarked = false;
 };

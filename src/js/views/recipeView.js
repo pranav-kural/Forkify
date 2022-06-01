@@ -22,6 +22,17 @@ class RecipeView extends ParentView {
       handler(btn.dataset.updateTo);
     });
   }
+
+  addBookmarksHandler(handler) {
+    this._parentElement.addEventListener('click', e => {
+      // select the bookmark button
+      const btn = e.target.closest('.btn--bookmark');
+      // return if click wasn't on button
+      if (!btn) return;
+      // execute handler
+      handler();
+    });
+  }
 }
 
 // export a new instance of recipeView

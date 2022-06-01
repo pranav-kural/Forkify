@@ -581,12 +581,18 @@ const controlServings = (newServings)=>{
     // recipeView.render(model.state.recipe);
     (0, _recipeViewDefault.default).update(_model.state.recipe);
 };
+const controlBookmarks = ()=>{
+    if (!_model.state.recipe.bookmarked || _model.state.recipe.bookmarked === false) _model.addBookmark(_model.state.recipe);
+    else _model.deleteBookmark(_model.state.recipe);
+    (0, _recipeViewDefault.default).update(_model.state.recipe);
+};
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
     (0, _searchViewDefault.default).addEventHandler(controlSearchResults);
     (0, _paginationViewDefault.default).addEventHandler(controlPagination);
     (0, _recipeViewDefault.default).handleServingsUpdate(controlServings);
+    (0, _recipeViewDefault.default).addBookmarksHandler(controlBookmarks);
 })();
 
 },{"core-js/modules/es.array.includes.js":"dkJzX","core-js/modules/web.immediate.js":"49tUX","regenerator-runtime/runtime":"dXNgZ","./model":"Y4A21","./views/recipeView":"l60JC","./views/searchView":"9OQAM","./views/resultsView":"cSbZE","./views/paginationView":"6z7bi","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dkJzX":[function(require,module,exports) {
@@ -2405,6 +2411,8 @@ parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
 parcelHelpers.export(exports, "updateServings", ()=>updateServings);
+parcelHelpers.export(exports, "addBookmark", ()=>addBookmark);
+parcelHelpers.export(exports, "deleteBookmark", ()=>deleteBookmark);
 var _regeneratorRuntime = require("regenerator-runtime");
 // import helper functions
 var _utils = require("./utils");
@@ -2418,13 +2426,15 @@ const state = {
         results: {},
         currentPage: 1,
         resultsPerPage: (0, _config.SEARCH_RESULTS_PER_PAGE)
-    }
+    },
+    bookmarks: []
 };
 const loadRecipe = async function(recipeId) {
     try {
         // get recipe data using getJSON helper function and update state to store recipe data
         // transform property names in original recipe data object to camelCase
         state.recipe = (0, _utils.transformObjPropNamesToCamelCase)(await (0, _helpers.getJSON)(`${(0, _config.FORKIFY_API_URL)}${recipeId}`).then((responseData)=>responseData.data.recipe));
+        state.recipe.bookmarked = state.bookmarks.some((bookmarkedRecipe)=>bookmarkedRecipe.id === recipeId);
     } catch (err) {
         throw err;
     }
@@ -2443,18 +2453,30 @@ const loadSearchResults = async function(query) {
 };
 const getSearchResultsPage = (page = state.search.currentPage)=>{
     // if no results present, return
-    if (state.search.results === {}) return;
+    if (!state.search.results || state.search.results === {}) return;
     // update state to represent current page
     state.search.currentPage = page;
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
-    return state.search.results.slice(start, end); // return page results
+    if (state.search.results.slice) return state.search.results.slice(start, end); // return page results
 };
 const updateServings = (newServings)=>{
     state.recipe.ingredients.forEach((ing)=>{
         ing.quantity = ing.quantity * newServings / state.recipe.servings;
     });
     state.recipe.servings = newServings;
+};
+const addBookmark = (recipe)=>{
+    // add recipe to the bookmarks
+    state.bookmarks.push(recipe);
+    // mark current recipe as bookmark
+    if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+const deleteBookmark = (recipe)=>{
+    const index = state.bookmarks.findIndex((el)=>el.id === recipe.id);
+    state.bookmarks.splice(index, 1);
+    // remove the bookmark
+    if (recipe.id === state.recipe.id) state.recipe.bookmarked = false;
 };
 
 },{"regenerator-runtime":"dXNgZ","./utils":"72Dku","./config":"k5Hzs","./helpers":"hGI1E","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"72Dku":[function(require,module,exports) {
@@ -2573,6 +2595,16 @@ class RecipeView extends (0, _parentViewDefault.default) {
             if (!btn || btn.dataset.updateTo <= 0) return;
             // call provided handler function providing new serving quantity
             handler(btn.dataset.updateTo);
+        });
+    }
+    addBookmarksHandler(handler) {
+        this._parentElement.addEventListener("click", (e)=>{
+            // select the bookmark button
+            const btn = e.target.closest(".btn--bookmark");
+            // return if click wasn't on button
+            if (!btn) return;
+            // execute handler
+            handler();
         });
     }
 }
@@ -2697,9 +2729,9 @@ function recipeHTML(recipe) {
             </svg>
           -->
           </div>
-          <button class="btn--round">
+          <button class="btn--round btn--bookmark">
             <svg class="">
-              <use href="${0, _iconsSvgDefault.default}.svg#icon-bookmark-fill"></use>
+              <use href="${0, _iconsSvgDefault.default}.svg#icon-bookmark${recipe.bookmarked ? "-fill" : ""}"></use>
             </svg>
           </button>
         </div>
