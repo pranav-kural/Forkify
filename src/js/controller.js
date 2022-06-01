@@ -9,11 +9,7 @@ import recipeView from './views/recipeView';
 import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
-
-// hot reloading for parcel
-// if (module.hot) {
-//   module.hot.accept();
-// }
+import bookmarksView from './views/bookmarksView';
 
 const controlRecipe = async function () {
   // get recipe Id from hash (remove first '#' character)
@@ -24,6 +20,8 @@ const controlRecipe = async function () {
   recipeView.renderSpinner();
   // Update results view to mark selected search result
   resultsView.update(model.getSearchResultsPage());
+  // update bookmarks
+  bookmarksView.update(model.state.bookmarks);
   // get recipe data and pass it on to renderRecipe function
   model
     .loadRecipe(recipeId)
@@ -83,10 +81,14 @@ const controlServings = newServings => {
 };
 
 const controlBookmarks = () => {
+  // add or remove book
   if (!model.state.recipe.bookmarked || model.state.recipe.bookmarked === false)
     model.addBookmark(model.state.recipe);
   else model.deleteBookmark(model.state.recipe);
+  // update recipe view
   recipeView.update(model.state.recipe);
+  // render bookmarks
+  bookmarksView.render(model.state.bookmarks);
 };
 
 // initialize event handler
