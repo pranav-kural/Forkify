@@ -97,9 +97,6 @@ const controlBookmarks = () => {
 
 const controlBookmarksView = () => bookmarksView.render(model.state.bookmarks);
 
-const clearBookmarks = () => localStorage.clear('bookmarks');
-// clearBookmarks();
-
 const controlAddRecipe = async newRecipe => {
   try {
     // hide close button on add recipe modal temporarily (will close window later)
@@ -110,6 +107,10 @@ const controlAddRecipe = async newRecipe => {
     await model.uploadRecipe(newRecipe);
     // render the new recipe
     recipeView.render(model.state.recipe);
+    // re-render bookmarks
+    bookmarksView.render(model.state.bookmarks);
+    // update the hash value on browser address bar
+    window.history.pushState(null, '', `#${model.state.recipe.id}`);
     // display success message
     addRecipeView.renderMessage();
     // close form window
@@ -120,6 +121,9 @@ const controlAddRecipe = async newRecipe => {
     addRecipeView.renderError(err.message);
   }
 };
+
+const clearBookmarks = () => localStorage.clear('bookmarks');
+clearBookmarks();
 
 // initialize event handler
 (function () {

@@ -27,9 +27,9 @@ export const loadRecipe = async function (recipeId) {
     // get recipe data using getJSON helper function and update state to store recipe data
     // transform property names in original recipe data object to camelCase
     state.recipe = transformObjPropNamesToCamelCase(
-      await getJSON(`${FORKIFY_API_URL}/${recipeId}`).then(
-        responseData => responseData.data.recipe
-      )
+      await getJSON(
+        `${FORKIFY_API_URL}/${recipeId}?key=${FORKIFY_API_KEY}`
+      ).then(responseData => responseData.data.recipe)
     );
 
     state.recipe.bookmarked = state.bookmarks.some(
@@ -44,7 +44,9 @@ export const loadRecipe = async function (recipeId) {
 export const loadSearchResults = async function (query) {
   try {
     // get all recipes for the given query
-    const data = await getJSON(`${FORKIFY_API_URL}?search=${query}`);
+    const data = await getJSON(
+      `${FORKIFY_API_URL}?search=${query}&key=${FORKIFY_API_KEY}`
+    );
     // update the state
     state.search.query = query;
     state.search.results = data.data.recipes.map(recipe =>
@@ -116,7 +118,6 @@ export const uploadRecipe = async function (newRecipe) {
       `${FORKIFY_API_URL}?key=${FORKIFY_API_KEY}`,
       recipe
     );
-    console.log('responseData', responseData);
     // update the state
     state.recipe = transformObjPropNamesToCamelCase(responseData.data.recipe);
 
@@ -134,7 +135,7 @@ const _extractIngredients = recipe =>
         recipeEl.startsWith('ingredient') && ingredient
     )
     .map(([_, ingInfo]) => {
-      const IngInfoExtracted = ingInfo.replaceAll(' ', '').split(',');
+      const IngInfoExtracted = ingInfo.split(',').map(el => el.trim());
       // throw error if provided ingredients invalid
       if (IngInfoExtracted.length !== 3)
         throw new Error(

@@ -47,12 +47,10 @@ export function recipeHTML(recipe) {
             </div>
           </div>
 
-          <div class="recipe__user-generated">
-          <!--
+          <div class="recipe__user-generated ${recipe.key ? '' : 'hidden'}">
             <svg>
-              <use href="${icons}.svg#icon-user"></use>
+              <use href="${icons}#icon-user"></use>
             </svg>
-          -->
           </div>
           <button class="btn--round btn--bookmark">
             <svg class="">
@@ -135,6 +133,11 @@ function generatePreviewComponent(data) {
               <div class="preview__data">
                 <h4 class="preview__title">${data.title}</h4>
                 <p class="preview__publisher">${data.publisher}</p>
+                <div class="recipe__user-generated ${data.key ? '' : 'hidden'}">
+                  <svg>
+                    <use href="${icons}#icon-user"></use>
+                  </svg>
+                </div>
               </div>
             </a>
           </li>
