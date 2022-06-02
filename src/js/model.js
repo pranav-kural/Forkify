@@ -2,8 +2,12 @@ import { async } from 'regenerator-runtime';
 // import helper functions
 import { transformObjPropNamesToCamelCase } from './utils';
 // import api url from config
-import { FORKIFY_API_URL, SEARCH_RESULTS_PER_PAGE } from './config';
-import { getJSON } from './helpers';
+import {
+  FORKIFY_API_KEY,
+  FORKIFY_API_URL,
+  SEARCH_RESULTS_PER_PAGE,
+} from './config';
+import { getJSON, sendJSON } from './helpers';
 
 // state object
 export const state = {
@@ -23,7 +27,7 @@ export const loadRecipe = async function (recipeId) {
     // get recipe data using getJSON helper function and update state to store recipe data
     // transform property names in original recipe data object to camelCase
     state.recipe = transformObjPropNamesToCamelCase(
-      await getJSON(`${FORKIFY_API_URL}${recipeId}`).then(
+      await getJSON(`${FORKIFY_API_URL}/${recipeId}`).then(
         responseData => responseData.data.recipe
       )
     );
@@ -91,6 +95,54 @@ export const deleteBookmark = recipe => {
   // update bookmarks in persistent storage
   persistBookmarks();
 };
+
+export const uploadRecipe = async function (newRecipe) {
+  if (!newRecipe) return;
+
+  try {
+    // create the recipe object per API structure
+    const recipe = {
+      title: newRecipe.title,
+      source_url: newRecipe.sourceUrl,
+      image_url: newRecipe.imageUrl,
+      publisher: newRecipe.publisher,
+      cooking_time: +newRecipe.cookingTime,
+      servings: +newRecipe.servings,
+      ingredients: _extractIngredients(newRecipe),
+    };
+
+    // submit the new recipe to the API
+    const responseData = await sendJSON(
+      `${FORKIFY_API_URL}?key=${FORKIFY_API_KEY}`,
+      recipe
+    );
+    console.log('responseData', responseData);
+    // update the state
+    state.recipe = transformObjPropNamesToCamelCase(responseData.data.recipe);
+
+    // bookmark the recipe;
+    addBookmark(state.recipe);
+  } catch (err) {
+    throw err;
+  }
+};
+
+const _extractIngredients = recipe =>
+  Object.entries(recipe)
+    .filter(
+      ([recipeEl, ingredient]) =>
+        recipeEl.startsWith('ingredient') && ingredient
+    )
+    .map(([_, ingInfo]) => {
+      const IngInfoExtracted = ingInfo.replaceAll(' ', '').split(',');
+      // throw error if provided ingredients invalid
+      if (IngInfoExtracted.length !== 3)
+        throw new Error(
+          'Wrong ingredients format! Please use the correct format!'
+        );
+      const [quantity, unit, description] = IngInfoExtracted;
+      return { quantity, unit, description };
+    });
 
 const init = () => {
   // get stored bookmarks

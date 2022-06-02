@@ -10,7 +10,9 @@ import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
 import bookmarksView from './views/bookmarksView';
+import addRecipeView from './views/addRecipeView';
 import { isEmptyObject } from './helpers';
+import { ADD_RECIPE_MODAL_CLOSE_TIMEOUT_SECONDS } from './config';
 
 const controlRecipe = async function () {
   // get recipe Id from hash (remove first '#' character)
@@ -79,7 +81,6 @@ const controlServings = newServings => {
   // Update recipe servings (in state)
   model.updateServings(newServings);
   // Update the recipe view
-  // recipeView.render(model.state.recipe);
   recipeView.update(model.state.recipe);
 };
 
@@ -97,6 +98,28 @@ const controlBookmarks = () => {
 const controlBookmarksView = () => bookmarksView.render(model.state.bookmarks);
 
 const clearBookmarks = () => localStorage.clear('bookmarks');
+// clearBookmarks();
+
+const controlAddRecipe = async newRecipe => {
+  try {
+    // hide close button on add recipe modal temporarily (will close window later)
+    addRecipeView.hideCloseButtonTemp();
+    // render spinner
+    addRecipeView.renderSpinner();
+    // post the new recipe to API
+    await model.uploadRecipe(newRecipe);
+    // render the new recipe
+    recipeView.render(model.state.recipe);
+    // display success message
+    addRecipeView.renderMessage();
+    // close form window
+    setTimeout(() => {
+      addRecipeView.showHideAddRecipeForm();
+    }, ADD_RECIPE_MODAL_CLOSE_TIMEOUT_SECONDS * 1000);
+  } catch (err) {
+    addRecipeView.renderError(err.message);
+  }
+};
 
 // initialize event handler
 (function () {
@@ -106,4 +129,5 @@ const clearBookmarks = () => localStorage.clear('bookmarks');
   recipeView.handleServingsUpdate(controlServings);
   recipeView.addBookmarksHandler(controlBookmarks);
   bookmarksView.bookmarksRenderHandler(controlBookmarksView);
+  addRecipeView.submitFormHandler(controlAddRecipe);
 })();
