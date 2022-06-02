@@ -619,7 +619,7 @@ const controlAddRecipe = async (newRecipe)=>{
     }
 };
 const clearBookmarks = ()=>localStorage.clear("bookmarks");
-clearBookmarks();
+// clearBookmarks();
 // initialize event handler
 (function() {
     (0, _recipeViewDefault.default).addEventHandler(controlRecipe);
